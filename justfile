@@ -1,2 +1,19 @@
-install:
-    zig build install -Drelease-fast && cp zig-out/bin/zuniq ~/bin/.
+build-release:
+    zig build install -Drelease-fast
+
+install prefix-path:
+    zig build install -Drelease-fast -p {{prefix-path}}
+
+bench input-file: build-release
+    hyperfine --warmup 10 'zig-out/bin/zuniq {{input-file}}' 'runiq {{input-file}}'
+
+perf input-file: build-release
+    perf record --call-graph dwarf zig-out/bin/zuniq {{input-file}}
+
+perf-report:
+    perf report
+
+flamegraph:
+    perf script | stackcollapse-perf.pl | flamegraph.pl > perf.svg && \
+    firefox perf.svg
+
