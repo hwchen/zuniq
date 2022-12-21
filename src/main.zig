@@ -1,5 +1,6 @@
 const std = @import("std");
-const Set = std.StringHashMap(void);
+const Set = std.AutoHashMap(u64, void);
+const Wyhash = std.hash.Wyhash;
 
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -19,12 +20,10 @@ pub fn main() !void {
     var buf: [1024 * 8]u8 = undefined;
 
     while (try stdin.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        if (filter.contains(line)) {
+        const key = hash(line);
+        if (try filter.fetchPut(key, {})) |_| {
             continue;
         } else {
-            var key = try alloc.alloc(u8, line.len);
-            std.mem.copy(u8, key, line);
-            try filter.put(key, {});
             try stdout.print("{s}\n", .{line});
         }
 
@@ -37,4 +36,8 @@ pub fn main() !void {
     }
 
     try bw.flush(); // don't forget to flush!
+}
+
+fn hash(input: []const u8) u64 {
+    return Wyhash.hash(42, input);
 }
