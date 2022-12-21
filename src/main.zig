@@ -31,7 +31,7 @@ pub fn main() !void {
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
 
-    var buf: [1024 * 8]u8 = undefined;
+    var buf: [1024]u8 = undefined;
 
     while (try input.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         const key = hash(line);
