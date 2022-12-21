@@ -1,5 +1,5 @@
 const std = @import("std");
-const Set = std.AutoHashMap(u64, void);
+const Set = std.AutoHashMapUnmanaged(u64, void);
 const Wyhash = std.hash.Wyhash;
 
 pub fn main() !void {
@@ -7,7 +7,7 @@ pub fn main() !void {
     defer arena.deinit();
     var alloc = arena.allocator();
 
-    var filter = Set.init(alloc);
+    var filter = Set{};
 
     const stdin_file = std.io.getStdIn().reader();
     var br = std.io.bufferedReader(stdin_file);
@@ -21,7 +21,7 @@ pub fn main() !void {
 
     while (try stdin.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         const key = hash(line);
-        if (try filter.fetchPut(key, {})) |_| {
+        if (try filter.fetchPut(alloc, key, {})) |_| {
             continue;
         } else {
             try stdout.print("{s}\n", .{line});
