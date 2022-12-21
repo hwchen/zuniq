@@ -1,5 +1,5 @@
 build-release:
-    zig build install -Drelease-fast
+    zig build --zig-lib-dir ~/zigdev/zig/lib install -Drelease-fast
 
 install prefix-path:
     zig build install -Drelease-fast -p {{prefix-path}}
