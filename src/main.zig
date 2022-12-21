@@ -2,6 +2,8 @@ const std = @import("std");
 const Set = std.AutoHashMapUnmanaged(u64, void);
 const Wyhash = std.hash.Wyhash;
 
+var stdout_mutex = std.Thread.Mutex{};
+
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
@@ -23,6 +25,8 @@ pub fn main() !void {
     var br = std.io.bufferedReader(input_file);
     const input = br.reader();
 
+    stdout_mutex.lock();
+    defer stdout_mutex.unlock();
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
