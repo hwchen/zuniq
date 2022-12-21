@@ -9,9 +9,19 @@ pub fn main() !void {
 
     var filter = Set{};
 
-    const stdin_file = std.io.getStdIn().reader();
-    var br = std.io.bufferedReader(stdin_file);
-    const stdin = br.reader();
+    var args = try std.process.argsWithAllocator(alloc);
+    _ = args.skip();
+    const input_path = args.next() orelse return error.MissingInputPath;
+
+    const input_file = blk: {
+        if (std.mem.eql(u8, input_path, "-")) {
+            break :blk std.io.getStdIn().reader();
+        } else {
+            break :blk (try std.fs.cwd().openFile(input_path, .{})).reader();
+        }
+    };
+    var br = std.io.bufferedReader(input_file);
+    const input = br.reader();
 
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
@@ -19,7 +29,7 @@ pub fn main() !void {
 
     var buf: [1024 * 8]u8 = undefined;
 
-    while (try stdin.readUntilDelimiterOrEof(&buf, '\n')) |line| {
+    while (try input.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         const key = hash(line);
         if (try filter.fetchPut(alloc, key, {})) |_| {
             continue;
