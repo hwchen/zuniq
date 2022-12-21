@@ -1,3 +1,6 @@
+// Perf note: removing both filter and stdout stages, timing is the same as runiq doing all stages!
+// Does this mean that bufferedReader is especially slow?
+
 const std = @import("std");
 const Set = std.AutoHashMapUnmanaged(u64, void);
 const Wyhash = std.hash.Wyhash;
