@@ -2,7 +2,7 @@ build-release:
     zig build --zig-lib-dir ~/zigdev/zig/lib install -Drelease-fast
 
 install prefix-path:
-    zig build install -Drelease-fast -p {{prefix-path}}
+    zig build --zig-lib-dir ~/zigdev/zig/lib -Drelease-fast && cp zig-out/bin/zuniq {{prefix-path}}/.
 
 bench input-file: build-release
     hyperfine --warmup 10 'zig-out/bin/zuniq {{input-file}}' 'runiq {{input-file}}'
