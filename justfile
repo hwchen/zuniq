@@ -1,11 +1,14 @@
 build-release:
-    zig build --zig-lib-dir ~/zigdev/zig/lib install -Drelease-fast
+    zig build install -Drelease-fast -p zig-out
 
-install prefix-path:
-    zig build --zig-lib-dir ~/zigdev/zig/lib -Drelease-fast && cp zig-out/bin/zuniq {{prefix-path}}/.
+build-release-patched:
+    zig build install -Drelease-fast -p zig-out/patched --zig-lib-dir ~/zigdev/zig/lib
 
-bench input-file: build-release
-    hyperfine --warmup 10 'zig-out/bin/zuniq {{input-file}}' 'runiq {{input-file}}'
+install-patched prefix-path: build-release-patched
+    cp zig-out/patched/bin/zuniq {{prefix-path}}/.
+
+bench input-file: build-release build-release-patched
+    hyperfine --warmup 10 'zig-out/bin/zuniq {{input-file}}' 'zig-out/patched/bin/zuniq {{input-file}}' 'runiq {{input-file}}'
 
 perf input-file: build-release
     perf record --call-graph dwarf zig-out/bin/zuniq {{input-file}}
