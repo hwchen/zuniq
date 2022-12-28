@@ -2,7 +2,18 @@
 // Does this mean that bufferedReader is especially slow?
 
 const std = @import("std");
-const Set = std.AutoHashMapUnmanaged(u64, void);
+
+const Set = std.HashMapUnmanaged(u64, void, HashContext, 80);
+pub const HashContext = struct {
+    pub fn hash(self: @This(), k: u64) u64 {
+        _ = self;
+        return k;
+    }
+    pub fn eql(self: @This(), a: u64, b: u64) bool {
+        _ = self;
+        return a == b;
+    }
+};
 const Wyhash = std.hash.Wyhash;
 
 var stdout_mutex = std.Thread.Mutex{};
